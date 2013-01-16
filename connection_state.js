@@ -1,3 +1,5 @@
+//blah
+
 module.exports = {
   CONNECTED:         0,
   ENTER_PASSWORD:    1,
