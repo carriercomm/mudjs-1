@@ -1,0 +1,7 @@
+{ 
+  "name" : "mudjs", 
+  "version" : "1.0.0", 
+  "dependencies" : { 
+    "sandbox" : "0.8.3" 
+  } 
+}
