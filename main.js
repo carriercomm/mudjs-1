@@ -23,7 +23,6 @@ var server = net.createServer(function(socket) {
   clients.push(socket);
  
   socket.write('Welcome ' + socket.network_name + '\n');
-  send_prompt(socket);
   broadcast(socket.network_name + " has connected.\n", socket);
  
   socket.on('data', function(data) {
@@ -33,7 +32,6 @@ var server = net.createServer(function(socket) {
       receive_line(socket, splits[0]);
       splits.splice(0, 1);
     }
-	socket.input_buffer = splits[0];
   });
  
   socket.on('end', function() {
@@ -52,7 +50,7 @@ var server = net.createServer(function(socket) {
       case connection_state.CONFIRM_PASSWORD:
         break;
       case connection_state.PLAYING:
-        broadcast(socket.network_name + '> ' + data + '\n', socket);
+        broadcast(socket.network_name + '> ' + data, socket);
         break;
     }
     send_prompt(socket);
@@ -73,7 +71,7 @@ var server = net.createServer(function(socket) {
         socket.write('Confirm your password: ');
         break;
       case connection_state.PLAYING:
-        socket.write(socket.network_name + '> ');
+        socket.write('> ');
         break;
     }
   }
