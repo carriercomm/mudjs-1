@@ -16,21 +16,65 @@ var clients = [];
  
 var server = net.createServer(function(socket) {
  
-  socket.name = socket.remoteAddress + ':' + socket.remotePort 
- 
+  socket.network_name = socket.remoteAddress + ':' + socket.remotePort 
+  socket.input_buffer = ""
+  socket.connection_state = connection_state.PLAYING; //change to CONNECTED
+
   clients.push(socket);
  
-  socket.write('Welcome ' + socket.name + '\n');
-  broadcast(socket.name + " joined the game\n", socket);
+  socket.write('Welcome ' + socket.network_name + '\n');
+  broadcast(socket.network_name + " has connected.\n", socket);
  
   socket.on('data', function(data) {
-    broadcast(socket.name + '> ' + data, socket);
+    socket.input_buffer += data;
+    var splits = socket.input_buffer.split("\r\n");
+    while(splits.length > 1) {
+      receive_line(socket, splits[0]);
+      splits.splice(0, 1);
+    }
   });
  
   socket.on('end', function() {
     clients.splice(clients.indexOf(socket), 1);
-    broadcast(socket.name + ' left the game.\n');
+    broadcast(socket.network_name + ' left the game.\n');
   });
+
+  function receive_line(socket, data) {
+    switch(socket.connection_state) {
+      case connection_state.CONNECTED:
+        break;
+      case connection_state.ENTER_PASSWORD:
+        break;
+      case connection_state.NEW_CHAR_PASSWORD:
+        break;
+      case connection_state.CONFIRM_PASSWORD:
+        break;
+      case connection_state.PLAYING:
+        broadcast(socket.network_name + '> ' + data, socket);
+        break;
+    }
+    send_prompt(socket);
+  }
+ 
+  function send_prompt(socket) {
+    switch(socket.connection_state) {
+      case connection_state.CONNECTED:
+        socket.write('Please enter your username: ');
+        break;
+      case connection_state.ENTER_PASSWORD:
+        socket.write('Enter your password: ');
+        break;
+      case connection_state.NEW_CHAR_PASSWORD:
+        socket.write('Select a password (>= 6 characters): ');
+        break;
+      case connection_state.CONFIRM_PASSWORD:
+        socket.write('Confirm your password: ');
+        break;
+      case connection_state.PLAYING:
+        socket.write('> ');
+        break;
+    }
+  }
   
   function broadcast(message, sender) {
     clients.forEach(function (client) {
