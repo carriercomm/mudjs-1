@@ -33,7 +33,7 @@ var server = net.createServer(function(socket) {
       receive_line(socket, splits[0]);
       splits.splice(0, 1);
     }
-	socket.input_buffer = splits[0];
+    socket.input_buffer = splits[0];
   });
  
   socket.on('end', function() {
