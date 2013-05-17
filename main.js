@@ -82,6 +82,7 @@ var server = net.createServer(function(socket) {
     clients.forEach(function (client) {
       if (client === sender) return;
       client.write(message);
+	  send_prompt(client);
     });
     process.stdout.write(message)
   } 
